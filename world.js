@@ -1,3 +1,4 @@
+import {vertexWater,fragmentWater} from './ocean-shaders.js';
 import * as T from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 import {mergeGeometries} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/utils/BufferGeometryUtils.js';
 
@@ -9,33 +10,6 @@ function random(seed=71){return()=>{seed=(seed*16807)%2147483647;return(seed-1)/
 const smooth=(a,b,x)=>{const t=T.MathUtils.clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
 function noise(x,z){return Math.sin(x*.39+Math.sin(z*.21))*Math.cos(z*.31)+.45*Math.sin(x*.91-z*.52)+.22*Math.cos(x*1.72+z*1.38);}
 export function ground(x,z){const angle=Math.atan2(z/23,x/32),r=Math.hypot(x/32,z/23);const edge=1+.06*Math.sin(angle*7)+.035*Math.sin(angle*13);let y=4.1+noise(x,z)*.65;if(r<.67)y=4.4+noise(x,z)*.08;const cliff=smooth(.78*edge,.99*edge,r);y=y*(1-cliff)-3.8*cliff;if(z< -8&&r<.84)y+=Math.pow(Math.max(0,(-z-8)/14),1.4)*3.2*(1-cliff);return y;}
-const vertexWater=`uniform float uTime; varying vec3 vWorld; varying vec3 vNormalW;
-float wave(vec2 p){return sin(p.x*.16+uTime*.62)*.17+sin(p.y*.23-uTime*.47)*.13+sin((p.x+p.y)*.36+uTime*.8)*.065;}
-void main(){vec3 p=position; p.z=wave(p.xy);vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;vNormalW=normalize(vec3(-.16*.17*cos(p.x*.16+uTime*.62)-.36*.065*cos((p.x+p.y)*.36+uTime*.8),1.,-.23*.13*cos(p.y*.23-uTime*.47)-.36*.065*cos((p.x+p.y)*.36+uTime*.8)));gl_Position=projectionMatrix*viewMatrix*world;}`;
-const fragmentWater=`uniform float uTime;uniform float uNight;uniform vec3 uSun;varying vec3 vWorld;varying vec3 vNormalW;
-float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-void main(){
- vec3 eye=normalize(cameraPosition-vWorld),n=normalize(vNormalW);
- float r=length(vWorld.xz/vec2(32.,23.)),a=atan(vWorld.z/23.,vWorld.x/32.);
- float edge=1.+.06*sin(a*7.)+.035*sin(a*13.);
- float shallow=1.-smoothstep(edge+.05,edge+.42,r);
- vec3 deep=mix(vec3(.015,.27,.48),vec3(.008,.035,.105),uNight);
- vec3 turquoise=mix(vec3(.025,.65,.64),vec3(.015,.15,.23),uNight);
- vec3 col=mix(deep,turquoise,shallow*.8);
- float crest=sin(vWorld.x*.25+uTime*.62)+sin(vWorld.z*.34-uTime*.47);
- col*=mix(.84,1.12,step(.35,crest));
- float coast=(1.-smoothstep(.02,.14,abs(r-edge)))*step(.30,sin(r*180.-uTime*1.5+sin(a*23.)*1.6));
- float ribbons=smoothstep(1.80,1.86,crest)*(.35+.65*shallow);
- vec3 foam=mix(vec3(.76,.98,.87),vec3(.12,.32,.41),uNight);
- col=mix(col,foam,max(coast,ribbons*.65));
- float sun=step(.985,dot(reflect(-eye,n),normalize(uSun)));
- col=mix(col,vec3(1.,.9,.62),sun*.25*(1.-uNight));
- float haze=smoothstep(110.,380.,length(vWorld.xz));
- col=mix(col,mix(vec3(.37,.70,.78),vec3(.035,.065,.13),uNight),haze*.8);
- gl_FragColor=vec4(col,1.);
-#include <tonemapping_fragment>
-#include <colorspace_fragment>
-}`;
 const vertexSky=`varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
 const fragmentSky=`uniform float uNight;uniform vec3 uSun;varying vec3 vPos;
 void main(){
@@ -73,7 +47,7 @@ export function buildWorld(){
  const cascade=new T.Mesh(cascadeGeo,new T.ShaderMaterial({transparent:true,side:T.DoubleSide,depthWrite:false,uniforms:{uTime:{value:0}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform float uTime;varying vec2 vUv;void main(){float stream=sin(vUv.x*65.+sin(vUv.y*15.-uTime*2.)*2.);float ribbons=pow(.5+.5*stream,3.);float foam=pow(.5+.5*sin(vUv.y*180.-uTime*7.+vUv.x*11.),8.);float edge=smoothstep(0.,.15,vUv.x)*smoothstep(0.,.15,1.-vUv.x);vec3 col=mix(vec3(.06,.38,.41),vec3(.67,.89,.84),step(.55,ribbons)*.65+step(.7,foam)*.35);gl_FragColor=vec4(col,edge*.94);}'}));landscape.add(cascade);
  // Silhouettes anchor the horizon; simple distant terrain costs three draw calls.
  for(const [x,z,scale]of [[-140,-150,1.9],[70,-200,2.7],[160,-70,1.1]]){const distant=new T.PlaneGeometry(88,72,36,30);distant.rotateX(-Math.PI/2);for(let i=0;i<distant.attributes.position.count;i++){const p=distant.attributes.position;p.setY(i,ground(p.getX(i),p.getZ(i)));}distant.computeVertexNormals();const m=new T.Mesh(distant,celMaterial({color:0x659fa3,roughness:1}));m.position.set(x,-1,z);m.scale.set(scale,.9+scale*.6,scale*.5);m.rotation.y=x*.015;landscape.add(m);}
- const water=new T.Mesh(new T.PlaneGeometry(1800,1800,120,120),new T.ShaderMaterial({uniforms:{uTime:{value:0},uNight:{value:0},uSun:{value:new T.Vector3(-.65,.24,-.5)}},vertexShader:vertexWater,fragmentShader:fragmentWater}));water.rotation.x=-Math.PI/2;water.position.y=.04;scene.add(water);
+ const water=new T.Mesh(new T.PlaneGeometry(1800,1800,1,1),new T.ShaderMaterial({uniforms:{uTime:{value:0},uNight:{value:0},uSun:{value:new T.Vector3(-.65,.24,-.5)}},vertexShader:vertexWater,fragmentShader:fragmentWater}));water.rotation.x=-Math.PI/2;water.position.y=.04;scene.add(water);
  const sky=new T.Mesh(new T.SphereGeometry(750,32,20),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{uNight:{value:0},uSun:{value:new T.Vector3(-.65,.24,-.5)}},vertexShader:vertexSky,fragmentShader:fragmentSky}));scene.add(sky);
  const sun=new T.DirectionalLight(0xffedbe,2.2);sun.position.set(-48,42,-40);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-52,right:52,top:45,bottom:-45,near:1,far:170});sun.shadow.bias=-.00035;sun.shadow.normalBias=.22;sun.shadow.radius=1;scene.add(sun);const ambient=new T.HemisphereLight(0xc9f1ff,0x527451,.85);scene.add(ambient);const fill=new T.DirectionalLight(0x8cdbec,.3);fill.position.set(30,20,45);scene.add(fill);
  const coreLight=new T.PointLight(0xffca75,42,21,2);coreLight.position.set(0,8,0);scene.add(coreLight);
