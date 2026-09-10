@@ -1,4 +1,4 @@
-import * as T from './vendor/three.module.js';
+import * as T from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 export function buildProfessor(){
  const scene=new T.Scene();scene.background=new T.Color(0xbce9df);scene.fog=new T.Fog(0xbce9df,18,45);const camera=new T.PerspectiveCamera(37,1,.1,70);const group=new T.Group();scene.add(group);
  const mat=(c,r=.75)=>new T.MeshStandardMaterial({color:c,roughness:r});const skin=mat(0xf0c3a1),coat=mat(0xfff9e7),navy=mat(0x284257),hair=mat(0x493b31),shoe=mat(0x554c48),white=mat(0xffffff),ink=mat(0x243648),coral=mat(0xf28876),mint=mat(0x59bd9b),gold=mat(0xffd45f),blue=mat(0x74b7de);
