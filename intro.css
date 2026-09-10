@@ -10,3 +10,7 @@ body.intro-active{background:#bce9df}.intro-active #world-layer{visibility:visib
 /* Labels follow the portrait anchor; keep the robot's flight path clear. */
 .starter-label,.rival-label{right:auto;transform:none;font-size:11px;padding:6px 9px;white-space:nowrap;}
 .starter-label span,.rival-label span{font-size:8px;margin-top:3px;}
+
+/* The subtitle may wrap independently of the compact rival heading. */
+.rival-label{width:max-content;max-width:min(190px,calc(100vw - 24px));white-space:normal;box-sizing:border-box;}
+.rival-label span{max-width:none;white-space:normal;overflow-wrap:anywhere;line-height:1.4;}
