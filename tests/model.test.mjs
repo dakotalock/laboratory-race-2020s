@@ -1,9 +1,10 @@
+import {handheldView,handleHandheld} from '../handheld-ui.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {initial,nextMonth,buy,action,chooseResearch} from '../engine.js';
 import {modelTechs,modelBranches} from '../model-tech.js';
 import {ensureModel,developModel,advanceModel,ensureModelCard,resolveModelCard,dismissModelReceipt,reviewModel,modelExpression,modelReach,rivalModelProfiles} from '../model-system.js';
-import {bindModelSwipes,modelView,modelDecisionView} from '../model-ui.js';
+import {bindModelSwipes,modelDecisionView} from '../model-ui.js';
 import {ensureStory,advanceStory} from '../story.js';
 const copy=x=>JSON.parse(JSON.stringify(x));
 function ready(){const s=initial();ensureModel(s);return s;}
@@ -63,7 +64,13 @@ test('horizontal swipes choose once; scrolling, short drags and pointer cancella
  handlers.pointerdown(e(200,100));handlers.pointerup(e(90,101));assert.deepEqual(chosen,[1,0]);
  handlers.keydown({target:card,key:'ArrowLeft',preventDefault(){}});assert.deepEqual(chosen,[1,0,0]);
 });
-test('model page exposes the independent budget, reviews, prerequisites and sources',()=>{const s=ready();const html=modelView(s);for(const text of ['INSIGHT','Model reviews','Research note','SPECULATIVE','data-model-vitrine','Rival approaches'])assert.ok(html.includes(text),text);assert.equal(modelReach(s.model),0);});
+test('model menus expose independent budget, specimen, reviews and sourced development',()=>{
+ const s=ready();let html=handheldView('model',s);for(const text of ['INSIGHT','Reviews','data-model-vitrine'])assert.ok(html.includes(text),text);
+ handleHandheld('section','model:tree',s);html=handheldView('model',s);assert.ok(html.includes('Research note'));
+ handleHandheld('page','model-reason:4',s);assert.ok(handheldView('model',s).includes('SPECULATIVE'));
+ handleHandheld('section','model:rivals',s);assert.ok(handheldView('model',s).includes('Rival approaches'));
+ handleHandheld('model-back','',s);assert.equal(modelReach(s.model),0);
+});
 
 test('rival specializations spend separate budgets and respect prerequisites',()=>{
  for(const month of [0,8,20,40,84])for(const rival of rivalModelProfiles(month)){
