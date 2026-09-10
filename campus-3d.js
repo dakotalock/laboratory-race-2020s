@@ -1,10 +1,10 @@
-import * as T from './vendor/three.module.js';
-import {OrbitControls} from './vendor/addons/controls/OrbitControls.js';
-import {EffectComposer} from './vendor/addons/postprocessing/EffectComposer.js';
-import {RenderPass} from './vendor/addons/postprocessing/RenderPass.js';
-import {UnrealBloomPass} from './vendor/addons/postprocessing/UnrealBloomPass.js';
-import {OutputPass} from './vendor/addons/postprocessing/OutputPass.js';
-import {RoomEnvironment} from './vendor/addons/environments/RoomEnvironment.js';
+import * as T from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+import {EffectComposer} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/postprocessing/OutputPass.js';
+import {RoomEnvironment} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/environments/RoomEnvironment.js';
 import {buildProfessor} from './professor-scene.js';
 import {buildWorld} from './world.js';
 
