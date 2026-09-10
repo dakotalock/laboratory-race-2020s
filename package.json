@@ -1,0 +1,9 @@
+{
+  "name": "laboratory-race-2020s",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --import ./tests/register.mjs --test tests/graphics.test.mjs"
+  },
+  "devDependencies": {"three": "0.180.0"}
+}
