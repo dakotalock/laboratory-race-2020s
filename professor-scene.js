@@ -1,3 +1,4 @@
+import {buildLLM} from './llm-avatar.js';
 import * as T from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 import {celMaterial} from './cel-style.js';
 export function buildProfessor(){
@@ -22,7 +23,7 @@ export function buildProfessor(){
  // Three deliberately original 'starter' compute capsules on a demonstration table.
  const table=new T.Group();table.position.set(1.35,0,.1);group.add(table);box(white,0,1.2,0,1.9,.18,1.1,table);for(const x of [-.7,.7])box(mint,x,.59,0,.12,1.1,.8,table);
  const capsules=[];for(let i=0;i<3;i++){const x=(i-1)*.57;const c=new T.Group();c.position.set(x,1.48,0);table.add(c);mesh(new T.CylinderGeometry(.23,.23,.35,6),[coral,blue,gold][i],0,0,0,c);box(white,0,0,.21,.18,.12,.03,c);capsules.push(c);}
- const bot=new T.Group();bot.scale.setScalar(.6);bot.position.set(.22,2.72,.28);scene.add(bot);box(mint,0,0,0,.73,.6,.54,bot);box(ink,0,.04,.285,.57,.34,.04,bot);for(const x of [-.16,.16])ell(white,x,.065,.32,.063,.075,.025,bot);tube([[-.1,-.08,.32],[0,-.11,.33],[.1,-.08,.32]],.014,gold,bot);for(const x of [-.47,.47])ell(gold,x,-.06,0,.11,.17,.13,bot);mesh(new T.CylinderGeometry(.045,.045,.2,8),ink,0,.39,0,bot);ell(coral,0,.51,0,.1,.1,.1,bot);
+ const bot=buildLLM();bot.scale.setScalar(.6);bot.position.set(.22,2.72,.28);scene.add(bot);
  // Bright laboratory stage, circular floor, shelves, seedlings and tall windows.
  mesh(new T.CylinderGeometry(5.1,5.3,.25,64),white,0,-.16,0);mesh(new T.CylinderGeometry(4.95,4.95,.04,64),mat(0x93ceb9),0,-.02,0);for(let x=-4;x<=4;x++)box(white,x,0,0,.018,.008,7.4);for(let z=-3;z<=3;z++)box(white,0,.001,z,8,.008,.018);
  box(white,0,2.7,-3.2,11,5.5,.3);for(const x of [-3.6,0,3.6]){box(blue,x,3.15,-3,2.6,3.15,.08);box(white,x,3.15,-2.93,.09,3.15,.09);box(white,x,3.15,-2.93,2.6,.08,.09);}
