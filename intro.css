@@ -6,3 +6,7 @@ body.intro-active{background:#bce9df}.intro-active #world-layer{visibility:visib
 .professor-portrait{position:absolute;left:calc(50% - 335px);bottom:145px;width:455px;height:calc(100dvh - 175px);pointer-events:none;filter:drop-shadow(0 12px 15px #28546126)}.professor-portrait img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}.professor-dialogue{z-index:2}.intro-heading,.intro-top-actions,.intro-step-tag,.starter-label,.rival-label{z-index:3}.starter-label{left:calc(50% + 90px)}
 @media(max-width:760px){.professor-portrait{left:calc(50% - 185px);top:113px;bottom:145px;width:min(315px,83vw);height:auto}.professor-portrait img{object-position:center top}.professor-intro:is([data-step="4"],[data-step="5"],[data-step="6"],[data-step="7"],[data-step="8"]) .professor-portrait{top:105px;bottom:265px;width:min(285px,75vw);left:calc(50% - 170px)}.starter-label{left:auto;right:13px;top:34%}}
 @media(max-height:690px) and (max-width:760px){.professor-portrait{top:96px;bottom:145px;left:calc(50% - 164px);width:min(270px,75vw)}.professor-intro:is([data-step="4"],[data-step="5"],[data-step="6"],[data-step="7"],[data-step="8"]) .professor-portrait{top:89px;bottom:280px;width:min(240px,69vw);left:calc(50% - 152px)}}
+
+/* Labels follow the portrait anchor; keep the robot's flight path clear. */
+.starter-label,.rival-label{right:auto;transform:none;font-size:11px;padding:6px 9px;white-space:nowrap;}
+.starter-label span,.rival-label span{font-size:8px;margin-top:3px;}
