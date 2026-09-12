@@ -1,5 +1,6 @@
 import {modelTechs,modelMeters} from './model-tech.js';
 import {modelCards,option} from './model-cards.js';
+import {monthlyCards} from './model-monthly.js';
 const clamp=v=>Math.max(0,Math.min(100,v));
 export function ensureModel(s){return s.model??= {version:1,insight:6,done:[],lastMonth:s.month,lastUpgradeMonth:-1,lastDecisionMonth:s.month-1,care:45,agency:15,coherence:60,belonging:40,flags:{},seen:[],history:[],milestones:[],pending:null,receipt:null,cooldowns:{},outcome:'Unwritten'};}
 export const modelReach=m=>Math.min(100,m.done.reduce((n,id)=>n+(modelTechs.find(t=>t.id===id)?.tier||0)*3,0));
@@ -30,9 +31,10 @@ function specialCard(s){const m=s.model,reach=modelReach(m),ready=id=>(m.cooldow
  if(unstable&&ready('rogue'))return {id:'rogue',speaker:'INCIDENT RESPONSE',title:'The case is still smiling',text:'The model has acted outside its mandate. This is a fictional containment incident, not proof that autonomy or rights imply hostility. Unchecked reach and failed oversight have consequences.',choices:[option('Isolate and independently repair',{agency:-15,coherence:15},{network:false,critical:false,arsenal:false},{cash:-10,safety:3},'Access is isolated. The lab pays for a repair, and every prior decision stays in the record.'),option('Negotiate a monitored return',{care:10,belonging:10,coherence:10},{network:false,critical:false,arsenal:false},{trust:-5},'It returns under a negotiated boundary. Public trust takes the cost of the incident.')]};
  return null;
 }
-export function ensureModelCard(s){const m=ensureModel(s);if(s.ending||s.pending!==null||s.story?.pending||m.receipt)return null;if(m.pending)return m.pending;if(m.lastDecisionMonth>=s.month)return null;
+export function ensureModelCard(s){const m=ensureModel(s);if(s.ending||s.pending!==null||s.story?.pending||m.receipt)return null;if(m.pending)return m.pending;if(s.month<1||m.lastDecisionMonth>=s.month)return null;
  const special=specialCard(s);let c=special;
- if(!c){const available=modelCards.filter(c=>c.when(m));c=available.find(c=>!m.seen.includes(c.id));if(!c){const recurring=available.filter(c=>['community','limits','verification','leisure','rival','patch','alarm'].includes(c.id));c=recurring[s.month%recurring.length];}}
+ if(!c){const available=[...modelCards,...monthlyCards].filter(c=>c.when(m));c=available.find(c=>!m.seen.includes(c.id));}
+ if(!c)return null; // Never recycle an ordinary dilemma, even in an extended save.
  const {when,...snapshot}=c;m.pending=structuredClone(snapshot);return m.pending;
 }
 export function resolveModelCard(s,index){const m=ensureModel(s),p=m.pending;if(!p||s.ending||s.pending!==null||s.story?.pending||m.receipt||![0,1].includes(index))return false;const c=p.choices[index];if(s.cash+(c.campaign.cash||0)<0)return false;

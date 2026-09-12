@@ -19,8 +19,8 @@ function choices(names,q){return routes.map((route,i)=>({id:route,name:names[i],
  // Annual promises produce later receipts, even after a route change.
  delay:q>0&&q%4===0?(i===0?{in:2,text:'LIGHTHOUSE’s public dividend returned investment to the island.',effect:{equality:3,trust:2}}:i===1?{in:2,text:'LIGHTHOUSE’s exclusive terms prompted a public challenge.',effect:{trust:-4,gov:-2}}:{in:2,text:'The independent LIGHTHOUSE review reduced deployment exposure.',effect:{risk:-3,safety:2}}):null
 }));}
-function arrival(s){return {id:'arrival',title:s.month?'A familiar island. A new visitor.':'Welcome to your extremely normal island',route:storyRoute(s),page:0,
- lines:[s.month?`Director, Julian Vale. Your investor liaison. I have reviewed ${s.month} months of ${s.name}’s history. I see the spreadsheets have already developed a plot.`:`Welcome to ${s.name}. I’m Julian Vale, your investor liaison. Technically I represent the board. Spiritually, I represent the last person who read the insurance policy.`,
+function arrival(s){return {id:'arrival',title:s.month>1?'A familiar island. A new visitor.':'The first monthly check-in',route:storyRoute(s),page:0,
+ lines:[s.month>1?`Director, Julian Vale. Your investor liaison. I have reviewed ${s.month} months of ${s.name}’s history. I see the spreadsheets have already developed a plot.`:`Your first month at ${s.name}, and the island is still here. An excellent start. I’m Julian Vale, your investor liaison. Technically I represent the board. Spiritually, I represent the last person who read the insurance policy.`,
  'We bought an island to think freely. The island came with a town, a hospital and a ferry captain who does not accept “exponential growth” as a departure time.',
  'Our engineers call their local infrastructure pilot LIGHTHOUSE. Power, ferries, emergency services. A modest first step toward improving the world, or acquiring it. Before I tell the board: who are we building this for?'],
  choices:choices(['The people who live with it','The company taking the risk','An independent public compact'],0)};}
@@ -38,11 +38,12 @@ function finale(s){const route=storyRoute(s),kind=s.ending.kind;
 }
 // Snapshot the whole scene so reloading mid-dialogue cannot reroll its branch.
 export function ensureStory(s){
- if(!s.story)s.story={version:1,scores:{commons:0,empire:0,accord:0},history:[],pending:null,nextMonth:(Math.floor(s.month/3)+1)*3,arrived:false,finalSeen:false};
+ if(!s.story)s.story={version:1,scores:{commons:0,empire:0,accord:0},history:[],pending:null,nextMonth:s.month<=1?4:(Math.floor(s.month/3)+1)*3,cadenceAnchor:s.month<=1?1:0,arrived:false,finalSeen:false};
  const st=s.story;
  if(st.pending)return st.pending;
  if(s.ending){if(!st.finalSeen)st.pending=finale(s);return st.pending;}
  if(s.pending!==null)return null;
+ if(s.month<1)return null;
  if(!st.arrived)st.pending=arrival(s);
  else if(s.month>=st.nextMonth)st.pending=chapter(s);
  return st.pending;
@@ -50,7 +51,7 @@ export function ensureStory(s){
 export function advanceStory(s){const p=s.story?.pending;if(!p)return false;
  if(p.response||p.page>=p.lines.length-1&&!p.choices.length){
   if(p.id==='finale')s.story.finalSeen=true;
-  else {s.story.arrived=true;s.story.nextMonth=(Math.floor(s.month/3)+1)*3;}
+  else {s.story.arrived=true;const anchor=s.story.cadenceAnchor||0;s.story.nextMonth=(Math.floor((s.month-anchor)/3)+1)*3+anchor;}
   s.story.pending=null;return true;
  }
  if(p.page<p.lines.length-1){p.page++;return true;}return false;

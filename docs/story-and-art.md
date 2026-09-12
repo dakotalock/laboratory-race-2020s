@@ -1,6 +1,6 @@
 # LIGHTHOUSE: first story draft
 
-Julian Vale is a fictional investor liaison. The arrival scene begins after onboarding; existing saves receive a catch-up arrival without replaying missed chapters. Visits occur on the next quarterly boundary, through month 81; campaign completion always receives a separate epilogue before the scorecard.
+Julian Vale is a fictional investor liaison. Professor Sam remains first. Fresh campaigns then enter the island with no Julian or LLM dialogue until the player ends month one. Julian’s first check-in is followed by visits at months 4, 7, and every three months through month 82. Existing saves retain in-progress scenes and their established quarterly cadence; late arrivals receive a catch-up without a backlog; campaign completion always receives a separate epilogue before the scorecard.
 
 The Commons, Empire and Accord paths combine accumulated story choices with operating policies. Every quarter has three authored scene variants. Earlier decisions, current safety gaps, runway, public trust, energy policy and rival progress affect dialogue. Choices change campaign resources without consuming management actions. Annual decisions add delayed consequences to the existing event queue. The decision archive is available in the director’s office.
 
