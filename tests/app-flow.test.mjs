@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {initial} from '../engine.js';
+import {initial,events} from '../engine.js';
 test('app flow: saved island, story dialogue, quarterly trigger, menus, intro replay',async()=>{
  const data=new Map([['laboratory-race-2020s-v1',JSON.stringify(initial('<Test & Lab>'))],['professor-intro-seen-v1','1'],['laboratory-music-v1','off']]);
  const handlers={};const app={innerHTML:'',addEventListener(name,fn){(handlers[name]??=[]).push(fn);}};
@@ -14,8 +14,13 @@ test('app flow: saved island, story dialogue, quarterly trigger, menus, intro re
  assert.match(app.innerHTML,/Welcome to your extremely normal island/);assert.match(app.innerHTML,/&lt;Test &amp; Lab&gt;/);
  click('act','turn');assert.equal(state().month,0);
  click('story','next');click('story','next');click('story','choose','empire');assert.equal(state().cash,108);click('story','next');assert.equal(state().story.pending,null);assert.equal(state().model.pending.id,'hello');click('model','choice','0');click('model','dismiss');
+ const beforeBrowse=state();
+ click('act','tab','people');click('ui','section','people:buildings');click('ui','page','buildings:3');assert.match(app.innerHTML,/Clean power campus/);assert.equal(state().actions,beforeBrowse.actions);assert.equal(state().cash,beforeBrowse.cash);
+ click('act','tab','research');click('ui','research-jump','asi');assert.match(app.innerHTML,/Artificial superintelligence/);click('ui','info','');assert.match(app.innerHTML,/data-id="science6"/);click('ui','research-jump','science6');assert.match(app.innerHTML,/Recursive improvement/);
+ click('act','tab','model');click('ui','section','model:reviews');assert.match(app.innerHTML,/Independent evaluation/);click('ui','model-back','');assert.match(app.innerHTML,/data-model-vitrine/);
+ click('act','tab','people');click('ui','section','people:team');click('ui','page','staff:0');const oldStaff=state().staff.researcher;click('act','hire','researcher');assert.equal(state().staff.researcher,oldStaff+1);assert.equal(state().actions,beforeBrowse.actions-1);
  for(const id of ['research','people','world','council','model','campus']){click('act','tab',id);assert.ok(app.innerHTML.includes('class="main '+id));}
- click('act','turn');click('act','choice','2');click('model','choice','0');click('model','dismiss');click('act','turn');click('model','choice','0');click('model','dismiss');click('act','turn');assert.equal(state().story.pending.id,'q1');
+ click('act','turn');const briefing=state();click('ui','page','event-'+briefing.pending+':2');assert.ok(app.innerHTML.includes(events[briefing.pending].choices[2].name));click('act','policy','pace:sprint');assert.equal(state().policies.pace,briefing.policies.pace);click('act','choice','2');click('model','choice','0');click('model','dismiss');click('act','turn');click('model','choice','0');click('model','dismiss');click('act','turn');assert.equal(state().story.pending.id,'q1');
  while(state().story.pending.page<state().story.pending.lines.length-1)click('story','next');click('story','choose','accord');click('story','next');click('model','choice','0');click('model','dismiss');
  click('act','menu');assert.match(app.innerHTML,/Island soundtrack/);click('act','story-archive');assert.match(app.innerHTML,/The ferry has shareholders/);click('act','close');
  click('act','professor');assert.match(app.innerHTML,/professor-intro/);click('intro','exit');assert.ok(!app.innerHTML.includes('professor-intro'));assert.equal(state().month,3);
