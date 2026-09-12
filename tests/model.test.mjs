@@ -7,7 +7,7 @@ import {ensureModel,developModel,advanceModel,ensureModelCard,resolveModelCard,d
 import {bindModelSwipes,modelDecisionView} from '../model-ui.js';
 import {ensureStory,advanceStory} from '../story.js';
 const copy=x=>JSON.parse(JSON.stringify(x));
-function ready(){const s=initial();ensureModel(s);return s;}
+function ready(){const s=initial();s.month=1;ensureModel(s);return s;}
 function settle(s,i=0){ensureModelCard(s);if(s.model.pending){assert.ok(resolveModelCard(s,i));dismissModelReceipt(s);}}
 function month(s){s.month++;advanceModel(s);}
 test('independent Insight, one development slot, migration and protected pending decisions',()=>{
